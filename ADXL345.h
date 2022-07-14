@@ -24,47 +24,38 @@ extern "C" {
 #endif
 
 #include "main.h"
-#include "I2C_Master/MyI2C.h"
+#include "I2C/MyI2C.h"
 #include "ADXL345_Register.h"
 
-/* состояние процесса обмена данными с устройством как с отдельным элементом сети
- * 	применяется для отображения состояния процесса работы с устройством для главного кода
- */
-typedef enum ADXL345_status_t {//состояние устройства
-	ADXL_Init,		//устройство не настроено
-	ADXL_OK,		//устройство готово к опросу
-	ADXL_Faulth	//устройство неисправно
-} ADXL345_status;
+enum ADXL345_ADDRESS {
+	ADXL345_ADDR = 0xA6//Assumes ALT address pin low
+};
 
-/*	состояние обмена данными с устройством, использовать для завершения функции работы с устройством */
-typedef enum ADXL345_Connect_Status_t {
-	ADXL_Processing, //выполняется работа с устройством: обмен данными, обработка результатов
-	ADXL_Complite	//работа с устройством завершена, данные считаны/записаны корректно
-} ADXL_Connect_Status;
+#define ADXL345_DATA_LENGHT  6
 
-typedef struct ADXL345_RAW_t {
+typedef struct ADXL345_RAW {
 	int16_t X;
 	int16_t Y;
 	int16_t Z;
-} ADXL345_RAW;
+} ADXL345_RAW_t;
 
-typedef struct ADXL345_data_t {
+typedef struct ADXL345_data {
 	float X;
 	float Y;
 	float Z;
-} ADXL345_data;
+} ADXL345_data_t;
 
 //common data struct for sensor
-typedef struct ADXL345_dev_t {
-	uint8_t addr;
+typedef struct ADXL345 {
+	const uint8_t addr;
 	uint8_t step;
-	ADXL345_status status;
-	ADXL345_RAW raw;
-	ADXL345_data data;
-} ADXL345_dev;
+	Device_status_t status;
+	ADXL345_RAW_t raw;
+	ADXL345_data_t data;
+} ADXL345_t;
 
-ADXL_Connect_Status ADXL345_Init(I2C_Connection *_i2c, ADXL345_dev *dev, uint8_t *pbuffer);
-ADXL_Connect_Status ADXL345_GetData(I2C_Connection *_i2c, ADXL345_dev *dev, uint8_t *pbuffer);
+uint8_t ADXL345_Init(I2C_Connection *_i2c, ADXL345_t *dev);
+uint8_t ADXL345_GetData(I2C_Connection *_i2c, ADXL345_t *dev);
 float ADXL345_ConvertData (int16_t raw);
 
 #ifdef __cplusplus
