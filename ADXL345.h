@@ -19,6 +19,7 @@
 
 #ifndef ADXL345_H_
 #define ADXL345_H_
+
 #ifdef __cplusplus
 extern "C" {
 #endif
